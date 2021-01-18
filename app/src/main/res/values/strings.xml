@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DetectingBeacons</string>
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="not_support_bluetooth_msg">Este dispositivo no soporta bluetooth, no es posible buscar beacons</string>
+    <string name="start_looking_for_beacons">Empezando a buscar beacons</string>
+    <string name="no_beacons_detected">No se han encontrado beacons</string>
+    <string name="stopDetectingBeacons">Parando la busqueda de beacons</string>
+</resources>
