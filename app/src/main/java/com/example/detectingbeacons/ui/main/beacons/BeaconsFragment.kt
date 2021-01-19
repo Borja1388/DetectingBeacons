@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.RemoteException
@@ -55,16 +56,16 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Se le pone opacidad al button play
+        binding.play.background.alpha = 100
 
-        //Se inicializa el objeto BeaconManager con la configuracion AltBeacon y la Region
+        //Se inicializa el objeto BeaconManager y la Region
         mBeaconManager = BeaconManager.getInstanceForApplication(requireContext())
         mBeaconManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(IBEACON_LAYOUT))
         mBeaconManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(EDDYSTONE_UID_LAYOUT))
         mBeaconManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(EDDYSTONE_URL_LAYOUT))
         mBeaconManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(EDDYSTONE_TLM_LAYOUT))
-        mBeaconManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(ALBEACON_LAYOUT2))
         mBeaconManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(RUUVI_LAYOUT))
-        mBeaconManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(ALTBEACON_LAYOUT))
 
         val identifiers = ArrayList<Identifier>()
         mRegion = Region(ALL_BEACONS_REGION, identifiers)
@@ -80,14 +81,17 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
                     android.Manifest.permission.ACCESS_COARSE_LOCATION), 1)
         }
 
+        checkIfLocationEnabled()
+
 
         //Eventos onClik
         binding.play.setOnClickListener {
-            checkIfLocationEnabled()
+            startDetectingBeacons()
         }
 
         binding.stop.setOnClickListener {
             stopDetectingBeacons()
+
         }
     }
 
@@ -145,7 +149,19 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
         }
         mBeaconManager?.removeAllRangeNotifiers()
         mBeaconManager?.unbind(this)
-        binding.cardView.visibility = View.GONE
+        //Se cambian las propiedades del button Play y CardView
+        binding.play.isClickable = true
+        binding.play.isFocusable = true
+        binding.play.background.alpha = 255
+        binding.bluetoothAddress.text = ""
+        binding.uuidText.text = ""
+        binding.distanceText.text = ""
+        binding.majorText.text = ""
+        binding.minorTxt.text = ""
+        binding.rssi.text = ""
+        binding.tx.text = ""
+
+
     }
 
     private fun showToastMessage(message: String) {
@@ -186,23 +202,28 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
         if (beacons.isNullOrEmpty()) {
             showToastMessage(getString(R.string.no_beacons_detected))
         } else {
-            val nearestBeacon = beacons.minByOrNull {
+            val nearestBeacon = beacons.sortedBy {
+
                 it.distance
+
+            }.firstOrNull {
+                val major = try {
+                    it.id2
+                } catch (e: IndexOutOfBoundsException) {
+                    null
+                }
+                val minor = try {
+                    it.id3
+                } catch (e: IndexOutOfBoundsException) {
+                    null
+                }
+                major != null && minor != null
             }
+
             val distanceRound = nearestBeacon?.distance
 
             val uuid = try {
                 nearestBeacon?.id1?.toString()
-            } catch (e: IndexOutOfBoundsException) {
-                "0"
-            }
-            val major = try {
-                nearestBeacon?.id2?.toString()
-            } catch (e: IndexOutOfBoundsException) {
-                "0"
-            }
-            val minor = try {
-                nearestBeacon?.id3?.toString()
             } catch (e: IndexOutOfBoundsException) {
                 "0"
             }
@@ -217,8 +238,8 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
 
             binding.bluetoothAddress.text = nearestBeacon?.bluetoothAddress.toString()
             binding.uuidText.text = "UUID: $uuid"
-            binding.majorText.text = "Mayor: $major"
-            binding.minorTxt.text = "Minor: $minor"
+            binding.majorText.text = "Mayor: ${nearestBeacon?.id2}"
+            binding.minorTxt.text = "Minor: ${nearestBeacon?.id3}"
             binding.rssi.text = "RSSI: ${nearestBeacon?.rssi} dBm"
             binding.tx.text = "Tx: ${nearestBeacon?.txPower} dBm"
 
