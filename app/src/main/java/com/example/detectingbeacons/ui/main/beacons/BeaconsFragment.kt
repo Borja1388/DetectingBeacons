@@ -28,6 +28,7 @@ private const val ALL_BEACONS_REGION = "AllBeaconsRegion"
 private const val REQUEST_ENABLE_BT = 1
 private const val DEFAULT_SCAN_PERIOD_MS = 6000L
 private const val TAG = "BeaconFragment"
+//Protocolos para reconocer distintos tipos de beacons.
 const val RUUVI_LAYOUT = "m:0-2=0499,i:4-19,i:20-21,i:22-23,p:24-24" // TBD
 const val IBEACON_LAYOUT = "m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"
 const val ALTBEACON_LAYOUT = BeaconParser.ALTBEACON_LAYOUT
@@ -100,6 +101,7 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
         _binding = null
     }
 
+    //Metodo para comprobar si la localizazion esta encendida.
     private fun checkIfLocationEnabled() {
         val lm: LocationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val networkLocationEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
@@ -110,9 +112,11 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
         } else {
             val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(myIntent)
+            checkIsBluetoothEnabled()
         }
     }
 
+    //Metodo para comprobar si el bluetooth esta encendido
     private fun checkIsBluetoothEnabled() {
         val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
@@ -128,15 +132,18 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
 
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+            startDetectingBeacons()
         }
     }
 
+    //Metodo para empezar a buscoar los beacons
     private fun startDetectingBeacons() {
         mBeaconManager?.foregroundBetweenScanPeriod = DEFAULT_SCAN_PERIOD_MS
         mBeaconManager?.bind(this)
 
     }
 
+    //Metodo para parar la busqueda de beacons
     private fun stopDetectingBeacons() {
         try {
             mRegion?.let {
@@ -149,6 +156,7 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
         }
         mBeaconManager?.removeAllRangeNotifiers()
         mBeaconManager?.unbind(this)
+
         //Se cambian las propiedades del button Play y CardView
         binding.play.isClickable = true
         binding.play.isFocusable = true
@@ -198,10 +206,12 @@ class BeaconsFragment : Fragment(), BeaconConsumer, RangeNotifier {
         TODO("Not yet implemented")
     }
 
+    //Metodo para procesar los beacons detectados.
     override fun didRangeBeaconsInRegion(beacons: MutableCollection<Beacon>?, region: Region?) {
         if (beacons.isNullOrEmpty()) {
             showToastMessage(getString(R.string.no_beacons_detected))
         } else {
+
             val nearestBeacon = beacons.sortedBy {
 
                 it.distance
