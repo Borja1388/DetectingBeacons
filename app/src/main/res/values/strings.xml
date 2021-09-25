@@ -1,9 +1,15 @@
 <resources>
-    <string name="app_name">Detecting Beacons</string>
+    <string name="app_name">Valiza</string>
     <!-- TODO: Remove or change this placeholder text -->
 
     <string name="not_support_bluetooth_msg">Este dispositivo no soporta bluetooth, no es posible buscar beacons</string>
     <string name="start_looking_for_beacons">Empezando a buscar beacons</string>
     <string name="no_beacons_detected">No se han encontrado beacons</string>
     <string name="stopDetectingBeacons">Parando la busqueda de beacons</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="imageclose">imageClose</string>
+    <string name="imageBeacon">imageBeacon</string>
+    <string name="region_void">Region void</string>
+    <string name="exception_beacon">Se ha producido una excepción al empezar a buscar beacons</string>
 </resources>
