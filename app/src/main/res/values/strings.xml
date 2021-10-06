@@ -12,4 +12,7 @@
     <string name="imageBeacon">imageBeacon</string>
     <string name="region_void">Region void</string>
     <string name="exception_beacon">Se ha producido una excepción al empezar a buscar beacons</string>
+    <string name="cerca_de_ti">Cerca de ti</string>
+    <string name="museos">Museos</string>
+    <string name="mostrar_mapa">Mostrar mapa</string>
 </resources>
