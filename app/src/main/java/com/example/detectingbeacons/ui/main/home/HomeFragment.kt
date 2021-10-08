@@ -13,14 +13,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.detectingbeacons.R
 import com.example.detectingbeacons.databinding.FragmentHomeBinding
 import com.example.detectingbeacons.extensions.getImage
 import com.example.detectingbeacons.helpers.Constans
+import com.example.detectingbeacons.helpers.MockEvent
 import org.altbeacon.beacon.*
 
 
@@ -57,6 +61,19 @@ class HomeFragment : Fragment(), BeaconConsumer, RangeNotifier {
         val identifiers = ArrayList<Identifier>()
         mRegion = Region(Constans.ALL_BEACONS_REGION, identifiers)
 
+        //Se inicializan los recyclers
+        val listSites = MockEvent.nearbySites
+        val listMuseums = MockEvent.museums
+        binding.recyclerProximity.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        binding.recyclerProximity.adapter = EventsAdapter(listSites) {
+            //Insertar codigo en el caso que se quiera hacer algo con el click en en la imagen
+        }
+
+        binding.recyclerMuseum.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        binding.recyclerMuseum.adapter = EventsAdapter(listMuseums) {
+            //Insertar codigo en el caso que se quiera hacer algo con el click en en la imagen
+        }
+
         //Permisos de localizacion
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -76,9 +93,7 @@ class HomeFragment : Fragment(), BeaconConsumer, RangeNotifier {
                 ), 1
             )
         }
-
         checkIfLocationEnabled()
-
     }
 
     override fun onDestroy() {
